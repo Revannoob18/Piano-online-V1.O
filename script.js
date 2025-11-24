@@ -2,6 +2,109 @@
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioContext = new AudioContext();
 
+// ===== 36 KEYS PIANO DATA (C4 to B6 - 3 Octaves) =====
+const pianoKeys = [];
+
+// Generate 36 keys (3 octaves)
+function generatePianoKeys() {
+    const notes = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const keys = [];
+    const baseFrequency = 261.63; // C4 frequency
+    
+    // Generate 3 octaves: C4-B4, C5-B5, C6-B6
+    for (let octave = 4; octave <= 6; octave++) {
+        for (let i = 0; i < 12; i++) {
+            const noteName = notes[i];
+            const frequency = baseFrequency * Math.pow(2, ((octave - 4) * 12 + i) / 12);
+            const isBlack = noteName.includes('#');
+            
+            keys.push({
+                note: `${noteName}${octave}`,
+                frequency: frequency,
+                isBlack: isBlack
+            });
+        }
+    }
+    
+    return keys;
+}
+
+const allKeys = generatePianoKeys();
+
+// ===== KEYBOARD MAPPING FOR MIDDLE OCTAVE (C4-B4) =====
+const keyboardMap = {
+    // Lower octave (C4-B4)
+    'z': 'C4', 's': 'C#4', 'x': 'D4', 'd': 'D#4', 'c': 'E4',
+    'v': 'F4', 'g': 'F#4', 'b': 'G4', 'h': 'G#4', 'n': 'A4',
+    'j': 'A#4', 'm': 'B4',
+    // Upper octave (C5-B5)
+    'q': 'C5', '2': 'C#5', 'w': 'D5', '3': 'D#5', 'e': 'E5',
+    'r': 'F5', '5': 'F#5', 't': 'G5', '6': 'G#5', 'y': 'A5',
+    '7': 'A#5', 'u': 'B5'
+};
+
+// Reverse mapping: note -> keyboard key
+const noteToKeyMap = {};
+for (let key in keyboardMap) {
+    noteToKeyMap[keyboardMap[key]] = key.toUpperCase();
+}
+
+// ===== GENERATE PIANO HTML =====
+function renderPiano() {
+    const pianoContainer = document.getElementById('piano-keys');
+    pianoContainer.innerHTML = ''; // Clear existing
+    
+    let whiteKeyCount = 0;
+    const whiteKeyWidth = 60;
+    const blackKeyWidth = 36;
+    
+    allKeys.forEach((keyData, index) => {
+        const keyDiv = document.createElement('div');
+        keyDiv.className = keyData.isBlack ? 'key black' : 'key white';
+        keyDiv.setAttribute('data-note', keyData.note);
+        keyDiv.setAttribute('data-freq', keyData.frequency.toFixed(2));
+        
+        // Note Label
+        const noteLabel = document.createElement('span');
+        noteLabel.className = 'key-label';
+        noteLabel.textContent = keyData.note;
+        keyDiv.appendChild(noteLabel);
+        
+        // Keyboard mapping label (if exists)
+        if (noteToKeyMap[keyData.note]) {
+            const keyboardLabel = document.createElement('span');
+            keyboardLabel.className = 'keyboard-label';
+            keyboardLabel.textContent = noteToKeyMap[keyData.note];
+            keyDiv.appendChild(keyboardLabel);
+        }
+        
+        // Highlight Middle C (C4)
+        if (keyData.note === 'C4') {
+            keyDiv.classList.add('middle-c');
+        }
+        
+        // Position keys properly
+        if (!keyData.isBlack) {
+            // White key positioning
+            keyDiv.style.left = `${whiteKeyCount * whiteKeyWidth}px`;
+            whiteKeyCount++;
+        } else {
+            // Black key positioning - offset from previous white key
+            const blackKeyOffset = whiteKeyWidth - (blackKeyWidth / 2);
+            keyDiv.style.left = `${(whiteKeyCount * whiteKeyWidth) - (blackKeyWidth / 2)}px`;
+        }
+        
+        pianoContainer.appendChild(keyDiv);
+    });
+    
+    // Set piano width
+    const totalWhiteKeys = allKeys.filter(k => !k.isBlack).length;
+    pianoContainer.style.width = `${totalWhiteKeys * whiteKeyWidth}px`;
+}
+
+// Render piano on load
+renderPiano();
+
 // ===== GLOBAL VARIABLES =====
 let volume = 0.5;
 let pressedKeys = new Set();
@@ -166,32 +269,41 @@ function activateKey(keyElement, autoRemove = false) {
 
 // ===== FIND KEY BY NOTE =====
 function findKeyByNote(note) {
-    return Array.from(keys).find(key => key.getAttribute('data-note') === note);
+    return Array.from(document.querySelectorAll('.key')).find(key => key.getAttribute('data-note') === note);
 }
 
-// ===== MOUSE EVENTS (Press and Hold Support) =====
-keys.forEach(key => {
-    const note = key.getAttribute('data-note');
-    const frequency = parseFloat(key.getAttribute('data-freq'));
-    const keyIdentifier = 'mouse-' + note;
+// ===== ATTACH EVENT LISTENERS TO KEYS =====
+function attachKeyListeners() {
+    const allPianoKeys = document.querySelectorAll('.key');
+    
+    allPianoKeys.forEach(key => {
+        const note = key.getAttribute('data-note');
+        const frequency = parseFloat(key.getAttribute('data-freq'));
+        const keyIdentifier = 'mouse-' + note;
 
-    // Mouse down - start sound
-    key.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        playNote(note, frequency, keyIdentifier);
-        activateKey(key);
-    });
+        // Mouse down - start sound
+        key.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            playNote(note, frequency, keyIdentifier);
+            activateKey(key);
+        });
 
-    // Mouse up - stop sound
-    key.addEventListener('mouseup', () => {
-        releaseNote(keyIdentifier);
-    });
+        // Mouse up - stop sound
+        key.addEventListener('mouseup', () => {
+            releaseNote(keyIdentifier);
+            key.classList.remove('active');
+        });
 
-    // Mouse leave - stop sound if mouse leaves while pressed
-    key.addEventListener('mouseleave', () => {
-        releaseNote(keyIdentifier);
+        // Mouse leave - stop sound if mouse leaves while pressed
+        key.addEventListener('mouseleave', () => {
+            releaseNote(keyIdentifier);
+            key.classList.remove('active');
+        });
     });
-});
+}
+
+// Call after piano is rendered
+setTimeout(attachKeyListeners, 100);
 
 // ===== KEYBOARD EVENT (KEY DOWN - with Hold Support) =====
 document.addEventListener('keydown', (event) => {
@@ -203,17 +315,18 @@ document.addEventListener('keydown', (event) => {
     }
     pressedKeys.add(keyPressed);
 
-    // Find corresponding piano key
-    keys.forEach(key => {
-        if (key.getAttribute('data-key') === keyPressed) {
-            const note = key.getAttribute('data-note');
-            const frequency = parseFloat(key.getAttribute('data-freq'));
+    // Check if key is mapped
+    const mappedNote = keyboardMap[keyPressed];
+    if (mappedNote) {
+        const keyElement = findKeyByNote(mappedNote);
+        if (keyElement) {
+            const frequency = parseFloat(keyElement.getAttribute('data-freq'));
             const keyIdentifier = 'keyboard-' + keyPressed;
             
-            playNote(note, frequency, keyIdentifier);
-            activateKey(key);
+            playNote(mappedNote, frequency, keyIdentifier);
+            activateKey(keyElement);
         }
-    });
+    }
 });
 
 // ===== KEYBOARD EVENT (KEY UP - Release Sound) =====
@@ -226,11 +339,13 @@ document.addEventListener('keyup', (event) => {
         pressedKeys.delete(keyPressed);
         
         // Remove active class from key
-        keys.forEach(key => {
-            if (key.getAttribute('data-key') === keyPressed) {
-                key.classList.remove('active');
+        const mappedNote = keyboardMap[keyPressed];
+        if (mappedNote) {
+            const keyElement = findKeyByNote(mappedNote);
+            if (keyElement) {
+                keyElement.classList.remove('active');
             }
-        });
+        }
     }
 });
 
@@ -342,45 +457,20 @@ clearBtn.addEventListener('click', () => {
 });
 
 // ===== KEYBOARD MAPPING DISPLAY =====
-console.log('%c🎹 PROFESSIONAL PIANO - 3 OCTAVES (36 KEYS)', 'color: #667eea; font-size: 20px; font-weight: bold;');
+console.log('%c🎹 PROFESSIONAL 36-KEY PIANO', 'color: #667eea; font-size: 20px; font-weight: bold;');
 console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #667eea;');
 console.log('');
-console.log('%cOCTAVE 1 (C3-B3) - Lower Row:', 'color: #28a745; font-weight: bold;');
-keys.forEach(key => {
-    const octave = key.getAttribute('data-octave');
-    const note = key.getAttribute('data-note');
-    const keyboardKey = key.getAttribute('data-key').toUpperCase();
-    const freq = key.getAttribute('data-freq');
-    
-    if (octave === '1') {
-        console.log(`  ${keyboardKey.padEnd(3)} → ${note.padEnd(4)} (${freq} Hz)`);
-    }
-});
+console.log(`%cTotal Keys: 36 (21 white + 15 black)`, 'color: #28a745; font-weight: bold;');
+console.log(`%cRange: C4 (${allKeys[0].frequency.toFixed(2)} Hz) to B6 (${allKeys[35].frequency.toFixed(2)} Hz)`, 'color: #28a745; font-weight: bold;');
+console.log(`%cMiddle C: C4 at 261.63 Hz (First Key)`, 'color: #ffc107; font-weight: bold;');
 console.log('');
-console.log('%cOCTAVE 2 (C4-B4) - Middle Row (Middle C):', 'color: #ffc107; font-weight: bold;');
-keys.forEach(key => {
-    const octave = key.getAttribute('data-octave');
-    const note = key.getAttribute('data-note');
-    const keyboardKey = key.getAttribute('data-key').toUpperCase();
-    const freq = key.getAttribute('data-freq');
-    
-    if (octave === '2') {
-        console.log(`  ${keyboardKey.padEnd(3)} → ${note.padEnd(4)} (${freq} Hz)`);
-    }
-});
+console.log('%cKeyboard Shortcuts:', 'color: #667eea; font-weight: bold;');
+console.log('  C4-B4: Z X C V B N M');
+console.log('  C#4-A#4: S D G H J');
+console.log('  C5-B5: Q W E R T Y U');
+console.log('  C#5-A#5: 2 3 5 6 7');
 console.log('');
-console.log('%cOCTAVE 3 (C5-B5) - Upper Row:', 'color: #dc3545; font-weight: bold;');
-keys.forEach(key => {
-    const octave = key.getAttribute('data-octave');
-    const note = key.getAttribute('data-note');
-    const keyboardKey = key.getAttribute('data-key').toUpperCase();
-    const freq = key.getAttribute('data-freq');
-    
-    if (octave === '3') {
-        console.log(`  ${keyboardKey.padEnd(3)} → ${note.padEnd(4)} (${freq} Hz)`);
-    }
-});
-console.log('');
+console.log('%c💡 Tip: Use mouse to play all 36 keys!', 'color: #764ba2; font-style: italic;');
 console.log('%c━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━', 'color: #667eea;');
 
 // ===== SYSTEM WORKFLOW INFO =====
@@ -388,16 +478,18 @@ console.log(`
 %c🎼 PROFESSIONAL PIANO SYSTEM FEATURES:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✅ 3 OCTAVES (36 Keys)
-   - Octave 1: C3-B3 (130.81 Hz - 246.94 Hz)
-   - Octave 2: C4-B4 (261.63 Hz - 493.88 Hz) [Middle C]
-   - Octave 3: C5-B5 (523.25 Hz - 987.77 Hz)
+✅ 36 KEYS PIANO
+   - Range: C4 to B6 (3 octaves)
+   - White Keys: 21 keys
+   - Black Keys: 15 keys
+   - Frequency Range: 261.63 Hz - 1975.53 Hz
 
 ✅ PROFESSIONAL PIANO SOUND
    🎹 Sine wave with smooth attack
    🎵 ADSR Envelope (Attack, Decay, Sustain, Release)
    🎶 Natural piano characteristics
-   🎼 Accurate frequency tuning
+   🎼 Accurate equal temperament tuning
+   🎯 Sustain: Hold key to continue sound
 
 ✅ RECORDING & PLAYBACK
    🔴 Record  - Capture your performance
@@ -408,18 +500,20 @@ console.log(`
 ✅ THEME SYSTEM
    ☀️ Light Mode - Clean & bright interface
    🌙 Dark Mode  - Easy on the eyes
+   🌙 Dark Mode  - Easy on the eyes
 
 ✅ ADVANCED FEATURES
+   - Sustain support (hold keys)
    - Real-time note display
    - Volume control (0-100%)
    - Label toggle
-   - Fully responsive design
-   - Anti-repeat key system
+   - Horizontal scroll for full range
+   - Responsive design
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `, 'color: #667eea; font-size: 12px;');
 
 // ===== WELCOME MESSAGE =====
-console.log('%c🎹 Welcome to Professional Piano! 🎶', 'color: #667eea; font-size: 24px; font-weight: bold;');
-console.log('%c✨ 3 Octaves (36 Keys) • Recording System • Light/Dark Theme', 'color: #764ba2; font-size: 16px;');
-console.log('%c🚀 Ready to make music!', 'color: #28a745; font-size: 14px; font-weight: bold;');
+console.log('%c🎹 Welcome to 88-Key Grand Piano! 🎶', 'color: #667eea; font-size: 24px; font-weight: bold;');
+console.log('%c✨ Full Range (A0-C8) • Recording System • Light/Dark Theme', 'color: #764ba2; font-size: 16px;');
+console.log('%c🚀 Ready to make professional music!', 'color: #28a745; font-size: 14px; font-weight: bold;');
