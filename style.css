@@ -181,6 +181,40 @@ header h1 {
     accent-color: #667eea;
 }
 
+.preset-select {
+    padding: 8px 12px;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    background: white;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.preset-select:hover {
+    background: #f0f0ff;
+    border-color: #5568d3;
+}
+
+.preset-select:focus {
+    border-color: #764ba2;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+body.dark-theme .preset-select {
+    background: rgba(102, 126, 234, 0.2);
+    color: #f0f0f0;
+    border-color: #667eea;
+}
+
+body.dark-theme .preset-select option {
+    background: #2a2a3a;
+    color: #f0f0f0;
+}
+
 .control-btn {
     padding: 10px 20px;
     border: 2px solid #667eea;
@@ -283,10 +317,10 @@ header h1 {
     justify-content: center;
     align-items: center;
     margin: 30px auto;
-    padding: 50px 20px;
-    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
-    border-radius: 20px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    padding: 36px 18px;
+    background: linear-gradient(180deg, #0f0f0f 0%, #0b0b0b 100%);
+    border-radius: 12px;
+    box-shadow: none; /* remove large container glow to avoid uneven lighting */
     overflow-x: auto;
     overflow-y: visible;
 }
@@ -321,12 +355,12 @@ header h1 {
     position: absolute;
     cursor: pointer;
     user-select: none;
-    transition: all 0.1s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 8px;
+    padding: 12px 6px;
 }
 
 /* White Keys */
@@ -336,26 +370,26 @@ header h1 {
     background: linear-gradient(to bottom, #ffffff 0%, #f8f8f8 100%);
     border: 2px solid #333;
     border-radius: 0 0 8px 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
     z-index: 1;
 }
 
 /* Middle C Highlight */
 .key.middle-c {
-    border: 3px solid #ffc107 !important;
-    box-shadow: 0 0 20px rgba(255, 193, 7, 0.7), 0 5px 12px rgba(0, 0, 0, 0.4) !important;
+    border: 3px solid #667eea !important;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.7), 0 5px 12px rgba(0, 0, 0, 0.4) !important;
 }
 
 .key.middle-c .key-label {
-    color: #ffc107 !important;
+    color: #667eea !important;
     font-weight: 900;
     font-size: 0.9rem !important;
 }
 
 .key.white:hover {
-    background: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(to bottom, #f5f5f5 0%, #eaeaea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.42);
 }
 
 .key.white:active,
@@ -370,10 +404,10 @@ header h1 {
 .key.black {
     width: 36px;
     height: 180px;
-    background: linear-gradient(to bottom, #1a1a1a 0%, #000000 100%);
+    background: linear-gradient(to bottom, #161616 0%, #000000 100%);
     border: 2px solid #000;
     border-radius: 0 0 6px 6px;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.8), inset 0 1px 3px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.85), inset 0 1px 2px rgba(255, 255, 255, 0.06);
     z-index: 2;
 }
 
@@ -418,9 +452,26 @@ header h1 {
     margin-top: 5px;
 }
 
+/* Octave-specific colors for keyboard labels */
+.keyboard-label.octave-c4 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+}
+
+.keyboard-label.octave-c5 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.4);
+}
+
+.keyboard-label.octave-c6 {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
 .key.black .keyboard-label {
-    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-    color: #222;
     font-size: 0.75rem;
     padding: 3px 6px;
 }
@@ -436,8 +487,8 @@ header h1 {
 }
 
 .key.black.has-keyboard-mapping {
-    border-color: #ffc107;
-    box-shadow: 0 0 12px rgba(255, 193, 7, 0.6), 0 6px 12px rgba(0, 0, 0, 0.7);
+    border-color: #667eea;
+    box-shadow: 0 0 12px rgba(102, 126, 234, 0.4), 0 6px 12px rgba(0, 0, 0, 0.7);
 }
 
 /* Pulse animation for keyboard label when key is active */
@@ -459,6 +510,26 @@ header h1 {
     0% { transform: translateX(-50%) scale(1); }
     50% { transform: translateX(-50%) scale(1.15); box-shadow: 0 5px 15px rgba(255, 193, 7, 0.9); }
     100% { transform: translateX(-50%) scale(1); }
+}
+
+/* Per-key soft glow/overlay to avoid uneven container lighting */
+.key::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    top: 6px;
+    bottom: 6px;
+    pointer-events: none;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.12s ease, box-shadow 0.12s ease;
+}
+
+.key.active::after {
+    opacity: 1;
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.6), 0 0 60px rgba(102, 126, 234, 0.4), 0 12px 36px rgba(102, 126, 234, 0.3);
+    background: radial-gradient(circle at center, rgba(102, 126, 234, 0.15) 0%, transparent 70%);
 }
 
 /* ===== KEYBOARD MAPPING INFO ===== */
@@ -516,8 +587,13 @@ header h1 {
 }
 
 .badge-yellow {
-    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
-    color: #333;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.badge-green {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
 }
 
 /* Dark theme */

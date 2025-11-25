@@ -25,6 +25,16 @@
                 <span id="volume-value">50%</span>
             </div>
 
+            <!-- Sound Preset Selector -->
+            <div class="setting-group">
+                <label for="sound-preset"><i class="fas fa-sliders-h"></i> Sound:</label>
+                <select id="sound-preset" class="preset-select">
+                    <option value="bright">Bright Piano</option>
+                    <option value="warm" selected>Warm Piano</option>
+                    <option value="mellow">Mellow Piano</option>
+                </select>
+            </div>
+
             <!-- Recording Controls -->
             <div class="setting-group">
                 <button id="record-btn" class="control-btn">
@@ -67,11 +77,12 @@
             <div class="info-badge">
                 <i class="fas fa-keyboard"></i>
                 <strong>Keyboard Shortcuts Available:</strong> 
-                Keys highlighted with colored borders can be played with your keyboard!
+                All 36 keys can be played with your keyboard - look for colored badges!
             </div>
             <div class="mapping-legend">
-                <span class="legend-item"><span class="badge badge-blue">Blue Border</span> = C4-B4 octave</span>
-                <span class="legend-item"><span class="badge badge-yellow">Yellow/Orange</span> = C5-B5 octave</span>
+                <span class="legend-item"><span class="badge badge-blue">Blue</span> = C4-B4 octave</span>
+                <span class="legend-item"><span class="badge badge-yellow">Yellow</span> = C5-B5 octave</span>
+                <span class="legend-item"><span class="badge badge-green">Green</span> = C6-B6 octave</span>
             </div>
         </div>
 
@@ -89,10 +100,10 @@
                 <div class="instruction-card">
                     <i class="fas fa-keyboard icon-large"></i>
                     <h4>Keyboard Controls</h4>
-                    <p><strong>24 keys mappable:</strong> Look for colored badges!</p>
-                    <p><strong>Lower (C4-B4):</strong> Z-M + S,D,G,H,J</p>
-                    <p><strong>Upper (C5-B5):</strong> Q-U + 2,3,5,6,7</p>
-                    <p><strong>All 36 keys:</strong> Click with mouse</p>
+                    <p><strong>All 36 keys mappable!</strong> Look for colored badges!</p>
+                    <p><strong>C4-B4:</strong> Z-M + S,D,G,H,J (Blue badges)</p>
+                    <p><strong>C5-B5:</strong> Q-U + 2,3,5,6,7 (Yellow badges)</p>
+                    <p><strong>C6-B6:</strong> A,L,I,O,P,K + 8,9,0,[,],\ (Green badges)</p>
                 </div>
                 <div class="instruction-card">
                     <i class="fas fa-record-vinyl icon-large"></i>
@@ -105,9 +116,9 @@
                 <div class="instruction-card">
                     <i class="fas fa-music icon-large"></i>
                     <h4>Piano Sound</h4>
-                    <p><strong>Quality:</strong> Professional piano tone</p>
+                    <p><strong>Quality:</strong> Additive synthesis + percussive attack</p>
+                    <p><strong>Presets:</strong> Bright, Warm, Mellow tones</p>
                     <p><strong>Range:</strong> 3 full octaves (C4-B6)</p>
-                    <p><strong>Keys:</strong> 36 keys (21 white + 15 black)</p>
                     <p><strong>Sustain:</strong> Hold key to sustain sound</p>
                 </div>
                 <div class="instruction-card">
@@ -115,8 +126,8 @@
                     <h4>Customization</h4>
                     <p><strong>Theme:</strong> Light/Dark mode</p>
                     <p><strong>Volume:</strong> 0-100% control</p>
+                    <p><strong>Sound:</strong> 3 preset options</p>
                     <p><strong>Labels:</strong> Show/hide notes</p>
-                    <p><strong>Responsive:</strong> Mobile friendly</p>
                 </div>
             </div>
         </div>
